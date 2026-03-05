@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from tokentoll.main import create_app
 from tokentoll.models.base import Base
-import tokentoll.models
+import tokentoll.models  # noqa: F401
 
 
 @pytest.fixture
