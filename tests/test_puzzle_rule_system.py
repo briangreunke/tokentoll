@@ -91,15 +91,17 @@ def test_rule_system_deterministic_and_answers() -> None:
     for question in challenge.questions:
         assert "Answer" in question.text
         assert normalize_answer(question.expected_answer, question.answer_format) == question.expected_answer
-        if "how many red tokens remain" in question.text:
-            assert question.expected_answer == str(final_state["red"])
+        if "how many" in question.text and "tokens remain" in question.text:
+            color = question.text.split("how many ", 1)[1].split(" tokens remain", 1)[0]
+            assert question.expected_answer == str(final_state[color])
         elif "how many total tokens" in question.text:
             total = sum(final_state.values())
             assert question.expected_answer == str(total)
-        elif "what is the value of green" in question.text:
-            assert question.expected_answer == str(final_state["green"])
-        elif "is blue greater than green" in question.text:
-            expected = "true" if final_state["blue"] > final_state["green"] else "false"
+        elif "is" in question.text and "greater than" in question.text:
+            tail = question.text.split("is ", 1)[1]
+            left = tail.split(" greater than ", 1)[0]
+            right = tail.split(" greater than ", 1)[1].split("?", 1)[0]
+            expected = "true" if final_state[left] > final_state[right] else "false"
             assert question.expected_answer == expected
         elif "list colors with at least" in question.text:
             threshold = int(question.text.split("at least ", 1)[1].split(" tokens", 1)[0])
@@ -107,6 +109,20 @@ def test_rule_system_deterministic_and_answers() -> None:
                 color
                 for color, value in final_state.items()
                 if value >= threshold
+            )
+            expected = ", ".join(colors)
+            assert question.expected_answer == expected
+        elif "minimum count" in question.text:
+            min_value = min(final_state.values())
+            colors = sorted(
+                color for color, value in final_state.items() if value == min_value
+            )
+            expected = ", ".join(colors)
+            assert question.expected_answer == expected
+        elif "maximum count" in question.text:
+            max_value = max(final_state.values())
+            colors = sorted(
+                color for color, value in final_state.items() if value == max_value
             )
             expected = ", ".join(colors)
             assert question.expected_answer == expected

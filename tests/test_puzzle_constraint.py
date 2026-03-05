@@ -8,11 +8,15 @@ from tokentoll.challenges.puzzles.constraint_satisfaction import ConstraintSatis
 
 
 def _parse_assignments(context: str) -> dict[str, dict[str, str]]:
-    pattern = re.compile(r"Assignment: (\w+) -> (\w+) at Slot (\d+)")
+    room_pattern = re.compile(r"Constraint: (\w+) is in Room (\w+)\.")
+    slot_pattern = re.compile(r"Constraint: (\w+) is scheduled at Slot (\d+)\.")
     assignments: dict[str, dict[str, str]] = {}
-    for match in pattern.finditer(context):
-        task, room, slot = match.groups()
-        assignments[task] = {"room": room, "slot": slot}
+    for match in room_pattern.finditer(context):
+        task, room = match.groups()
+        assignments.setdefault(task, {})["room"] = room
+    for match in slot_pattern.finditer(context):
+        task, slot = match.groups()
+        assignments.setdefault(task, {})["slot"] = slot
     return assignments
 
 

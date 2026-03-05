@@ -8,11 +8,15 @@ from tokentoll.challenges.puzzles.logic_grid import LogicGridPuzzle
 
 
 def _parse_assignments(context: str) -> dict[str, dict[str, str]]:
-    pattern = re.compile(r"Assignment: (\w+) -> (\w+), (\w+)")
+    city_pattern = re.compile(r"Clue: (\w+) works in (\w+)\.")
+    language_pattern = re.compile(r"Clue: The (\w+) developer is (\w+)\.")
     assignments: dict[str, dict[str, str]] = {}
-    for match in pattern.finditer(context):
-        person, language, city = match.groups()
-        assignments[person] = {"language": language, "city": city}
+    for match in city_pattern.finditer(context):
+        person, city = match.groups()
+        assignments.setdefault(person, {})["city"] = city
+    for match in language_pattern.finditer(context):
+        language, person = match.groups()
+        assignments.setdefault(person, {})["language"] = language
     return assignments
 
 

@@ -50,28 +50,28 @@ class RuleSystemPuzzle(PuzzleGenerator):
         context = "\n".join(lines)
 
         question_pool: list[tuple[str, object]] = [
-            ("red", None),
-            ("green", None),
+            ("count", "red"),
+            ("count", "blue"),
+            ("count", "green"),
             ("total", None),
-            ("compare", None),
+            ("compare", ("red", "blue")),
+            ("compare", ("red", "green")),
+            ("compare", ("blue", "green")),
+            ("threshold", 1),
             ("threshold", 2),
             ("threshold", 3),
+            ("min", None),
+            ("max", None),
         ]
-        chosen = rng.choices(question_pool, k=num_questions)
+        chosen = rng.sample(question_pool, k=num_questions)
 
         questions: list[Question] = []
         for index, (kind, value) in enumerate(chosen, start=1):
-            if kind == "red":
-                answer = str(final_state["red"])
+            if kind == "count":
+                color = cast(str, value)
+                answer = str(final_state[color])
                 text = (
-                    f"After {steps} steps, how many red tokens remain? "
-                    "Answer with an integer."
-                )
-                answer_format = "integer"
-            elif kind == "green":
-                answer = str(final_state["green"])
-                text = (
-                    f"After {steps} steps, what is the value of green? "
+                    f"After {steps} steps, how many {color} tokens remain? "
                     "Answer with an integer."
                 )
                 answer_format = "integer"
@@ -83,12 +83,35 @@ class RuleSystemPuzzle(PuzzleGenerator):
                 )
                 answer_format = "integer"
             elif kind == "compare":
-                answer = "true" if final_state["blue"] > final_state["green"] else "false"
+                left, right = cast(tuple[str, str], value)
+                answer = "true" if final_state[left] > final_state[right] else "false"
                 text = (
-                    f"After {steps} steps, is blue greater than green? "
+                    f"After {steps} steps, is {left} greater than {right}? "
                     "Answer with true/false."
                 )
                 answer_format = "boolean"
+            elif kind == "min":
+                min_value = min(final_state.values())
+                eligible = sorted(
+                    color for color, count in final_state.items() if count == min_value
+                )
+                answer = ", ".join(eligible)
+                text = (
+                    f"After {steps} steps, which colors have the minimum count? "
+                    "Answer with a comma-separated list, alphabetically sorted."
+                )
+                answer_format = "comma_separated_list"
+            elif kind == "max":
+                max_value = max(final_state.values())
+                eligible = sorted(
+                    color for color, count in final_state.items() if count == max_value
+                )
+                answer = ", ".join(eligible)
+                text = (
+                    f"After {steps} steps, which colors have the maximum count? "
+                    "Answer with a comma-separated list, alphabetically sorted."
+                )
+                answer_format = "comma_separated_list"
             else:
                 threshold_value = cast(int, value)
                 eligible = sorted(

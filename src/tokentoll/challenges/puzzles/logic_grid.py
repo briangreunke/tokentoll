@@ -39,12 +39,6 @@ class LogicGridPuzzle(PuzzleGenerator):
             lines.append(f"Clue: {person} works in {details['city']}.")
             lines.append(f"Clue: The {details['language']} developer is {person}.")
 
-        lines.append("Assignments:")
-        for person, details in assignments.items():
-            lines.append(
-                f"Assignment: {person} -> {details['language']}, {details['city']}"
-            )
-
         context = "\n".join(lines)
 
         question_pool: list[tuple[str, str]] = []

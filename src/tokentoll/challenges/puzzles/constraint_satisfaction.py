@@ -43,12 +43,6 @@ class ConstraintSatisfactionPuzzle(PuzzleGenerator):
             lines.append(f"Constraint: {task} is in Room {details['room']}.")
             lines.append(f"Constraint: {task} is scheduled at Slot {details['slot']}.")
 
-        lines.append("Assignments:")
-        for task, details in assignments.items():
-            lines.append(
-                f"Assignment: {task} -> {details['room']} at Slot {details['slot']}"
-            )
-
         context = "\n".join(lines)
 
         question_pool: list[tuple[str, object]] = []
