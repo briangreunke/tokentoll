@@ -3,13 +3,18 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from tokentoll.config import get_settings
+from tokentoll.crypto import load_or_generate_private_key
 from tokentoll.database import get_db
 from tokentoll.schemas.challenge import (
     ChallengeRequest,
     ChallengeResponse,
     QuestionOut,
+    VerifyRequest,
+    VerifyResponse,
 )
 from tokentoll.services.challenge_service import create_challenge
+from tokentoll.services.verify_service import verify_challenge
 
 
 router = APIRouter(tags=["challenges"])
@@ -45,3 +50,21 @@ async def request_challenge(
         ],
         expires_at=challenge.expires_at.isoformat(),
     )
+
+
+@router.post("/verify", response_model=VerifyResponse)
+async def verify_answers(
+    body: VerifyRequest,
+    db: AsyncSession = Depends(get_db),
+) -> VerifyResponse:
+    settings = get_settings()
+    private_key = load_or_generate_private_key(settings.rsa_private_key_path)
+    result = await verify_challenge(
+        db=db,
+        challenge_id=body.challenge_id,
+        nonce=body.nonce,
+        answers=body.answers,
+        commitment=body.commitment,
+        private_key=private_key,
+    )
+    return VerifyResponse(**result)

@@ -18,3 +18,17 @@ class ChallengeResponse(BaseModel):
     context: str
     questions: list[QuestionOut]
     expires_at: str
+
+
+class VerifyRequest(BaseModel):
+    challenge_id: str
+    nonce: str
+    answers: dict[str, str]
+    commitment: str
+
+
+class VerifyResponse(BaseModel):
+    success: bool
+    token: str | None = None
+    score: float | None = None
+    error: str | None = None
