@@ -3,6 +3,8 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from tokentoll.routers.sites import router as sites_router
+
 
 def create_app() -> FastAPI:
     app = FastAPI(title="TokenToll", version="0.1.0")
@@ -17,6 +19,8 @@ def create_app() -> FastAPI:
     @app.get("/health")
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    app.include_router(sites_router)
 
     return app
 
