@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from tokentoll.routers.challenges import router as challenges_router
 from tokentoll.routers.sites import router as sites_router
 
 
@@ -21,6 +22,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(sites_router)
+    app.include_router(challenges_router)
 
     return app
 
