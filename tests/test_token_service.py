@@ -96,7 +96,7 @@ async def test_siteverify_success(db_session: AsyncSession) -> None:
     assert response["success"] is True
     assert response["challenge_id"] == str(challenge.id)
     assert response["site_key"] == site.site_key
-    assert response["solved_at"] == solved_at.isoformat()
+    assert response["solved_at"] == challenge.solved_at.isoformat()
 
 
 @pytest.mark.asyncio
@@ -152,6 +152,22 @@ async def test_siteverify_rejects_expired_token(db_session: AsyncSession) -> Non
 
 
 @pytest.mark.asyncio
+async def test_siteverify_rejects_invalid_token(db_session: AsyncSession) -> None:
+    private_key, public_key = generate_rsa_key_pair()
+    site, raw_secret = await create_site(db_session, "Site One")
+
+    token = create_verification_token(
+        private_key=private_key,
+        challenge_id=str(uuid.uuid4()),
+        site_key=site.site_key,
+    )
+
+    response = await siteverify(db_session, raw_secret, f"{token}corrupt", public_key)
+
+    assert response == {"success": False, "error": "invalid_token"}
+
+
+@pytest.mark.asyncio
 async def test_siteverify_rejects_missing_challenge(
     db_session: AsyncSession,
 ) -> None:
@@ -167,6 +183,24 @@ async def test_siteverify_rejects_missing_challenge(
     response = await siteverify(db_session, raw_secret, token, public_key)
 
     assert response == {"success": False, "error": "challenge_not_found"}
+
+
+@pytest.mark.asyncio
+async def test_siteverify_rejects_invalid_challenge_id(
+    db_session: AsyncSession,
+) -> None:
+    private_key, public_key = generate_rsa_key_pair()
+    site, raw_secret = await create_site(db_session, "Site One")
+
+    token = create_verification_token(
+        private_key=private_key,
+        challenge_id="not-a-uuid",
+        site_key=site.site_key,
+    )
+
+    response = await siteverify(db_session, raw_secret, token, public_key)
+
+    assert response == {"success": False, "error": "invalid_challenge"}
 
 
 @pytest.mark.asyncio

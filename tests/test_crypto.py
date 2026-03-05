@@ -38,6 +38,12 @@ def test_load_or_generate_private_key_creates_and_loads(tmp_path) -> None:
     assert generated.private_numbers().public_numbers == loaded.private_numbers().public_numbers
 
 
+def test_load_or_generate_private_key_with_none_returns_key() -> None:
+    private_key = load_or_generate_private_key(None)
+
+    assert isinstance(private_key, RSAPrivateKey)
+
+
 def test_serialize_public_key_pem_round_trip() -> None:
     private_key, public_key = generate_rsa_key_pair()
 
