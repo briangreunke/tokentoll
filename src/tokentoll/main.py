@@ -19,8 +19,8 @@ def create_app() -> FastAPI:
     settings = get_settings()
     logging.basicConfig(level=settings.log_level)
     app = FastAPI(title="TokenToll", version="0.1.0")
-    app.add_middleware(RequestIdMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
+    app.add_middleware(RequestIdMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],

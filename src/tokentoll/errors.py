@@ -54,6 +54,9 @@ async def tokentoll_error_handler(
     exc: TokenTollError,
 ) -> JSONResponse:
     headers: dict[str, str] = {}
+    request_id = getattr(request.state, "request_id", None)
+    if request_id:
+        headers["X-Request-ID"] = request_id
     if isinstance(exc, RateLimitExceededError):
         headers["Retry-After"] = str(exc.retry_after)
         if exc.remaining is not None:
@@ -71,7 +74,11 @@ async def generic_error_handler(
 ) -> JSONResponse:
     request_id = getattr(request.state, "request_id", None)
     logger.error("Unhandled exception", exc_info=exc, extra={"request_id": request_id})
+    headers: dict[str, str] = {}
+    if request_id:
+        headers["X-Request-ID"] = request_id
     return JSONResponse(
         status_code=500,
         content={"error": "Internal server error"},
+        headers=headers,
     )
