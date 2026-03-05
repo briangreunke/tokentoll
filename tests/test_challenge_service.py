@@ -65,7 +65,10 @@ async def test_create_challenge_persists_answer_key_and_expiry(
     expiry_seconds = get_settings().challenge_expiry_seconds
     expected_min = started_at + timedelta(seconds=expiry_seconds)
     expected_max = finished_at + timedelta(seconds=expiry_seconds)
-    assert expected_min <= challenge.expires_at <= expected_max
+    expires_at = challenge.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    assert expected_min <= expires_at <= expected_max
 
     result = await db_session.execute(
         select(Challenge).where(Challenge.id == challenge.id)
