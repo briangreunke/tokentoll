@@ -75,4 +75,4 @@ async def test_request_challenge_invalid_site_key_returns_400(
     response = await client.post("/challenge", json={"site_key": "invalid"})
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Invalid or inactive site_key"
+    assert response.json()["detail"]["error"] == "invalid_or_inactive_site_key"

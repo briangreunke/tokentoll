@@ -27,7 +27,10 @@ async def request_challenge(
             db, body.site_key, ip_address
         )
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=400,
+            detail={"error": "invalid_or_inactive_site_key"},
+        ) from exc
 
     return ChallengeResponse(
         challenge_id=str(challenge.id),
