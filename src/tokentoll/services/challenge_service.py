@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from tokentoll.challenges.generator import generate_challenge
 from tokentoll.challenges.types import GeneratedChallenge
 from tokentoll.config import get_settings
+from tokentoll.errors import InvalidSiteKeyError
 from tokentoll.models import Challenge
 from tokentoll.services.site_service import get_site_by_key
 
@@ -19,7 +20,7 @@ async def create_challenge(
 ) -> tuple[Challenge, GeneratedChallenge]:
     site = await get_site_by_key(db, site_key)
     if site is None or not site.is_active:
-        raise ValueError("Invalid or inactive site_key")
+        raise InvalidSiteKeyError()
 
     generated = generate_challenge()
     settings = get_settings()

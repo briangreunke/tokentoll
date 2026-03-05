@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections import defaultdict
 from time import time
 
-from fastapi import HTTPException, Request
+from fastapi import Request
 
 from tokentoll.config import get_settings
+from tokentoll.errors import RateLimitExceededError
 
 
 class SlidingWindowRateLimiter:
@@ -60,11 +61,7 @@ async def check_rate_limit(request: Request) -> None:
     if not challenge_rate_limiter.is_allowed(ip_address):
         remaining = challenge_rate_limiter.remaining(ip_address)
         reset = challenge_rate_limiter.reset_time(ip_address)
-        raise HTTPException(
-            status_code=429,
-            detail={"error": "rate_limit_exceeded"},
-            headers={
-                "Retry-After": str(int(reset)),
-                "X-RateLimit-Remaining": str(remaining),
-            },
+        raise RateLimitExceededError(
+            retry_after=int(reset),
+            remaining=remaining,
         )

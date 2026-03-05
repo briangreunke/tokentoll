@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tokentoll.config import get_settings
@@ -33,15 +33,7 @@ async def request_challenge(
     db: AsyncSession = Depends(get_db),
 ) -> ChallengeResponse:
     ip_address = request.client.host if request.client else None
-    try:
-        challenge, generated = await create_challenge(
-            db, body.site_key, ip_address
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"error": "invalid_or_inactive_site_key"},
-        ) from exc
+    challenge, generated = await create_challenge(db, body.site_key, ip_address)
 
     return ChallengeResponse(
         challenge_id=str(challenge.id),

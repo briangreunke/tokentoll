@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     challenge_rate_limit_window_seconds: int = 60
     rsa_private_key_path: str | None = None
     debug: bool = False
+    log_level: str = "INFO"
 
     model_config = {"env_prefix": "TOKENTOLL_"}
 
