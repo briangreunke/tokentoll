@@ -40,7 +40,7 @@ async def test_generic_exception_handler_returns_500() -> None:
     async def boom() -> dict[str, str]:
         raise RuntimeError("boom")
 
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app, raise_app_exceptions=False)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/boom")
 
