@@ -35,6 +35,12 @@ def load_or_generate_private_key(path: str | None) -> rsa.RSAPrivateKey:
     return private_key
 
 
+def get_public_key(path: str | None) -> rsa.RSAPublicKey:
+    """Load or generate the configured RSA public key."""
+    private_key = load_or_generate_private_key(path)
+    return private_key.public_key()
+
+
 def serialize_public_key_pem(public_key: rsa.RSAPublicKey) -> str:
     """Serialize public key to PEM string (for customer distribution)."""
     pem = public_key.public_bytes(

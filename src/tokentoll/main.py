@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from tokentoll.routers.challenges import router as challenges_router
+from tokentoll.routers.siteverify import router as siteverify_router
 from tokentoll.routers.sites import router as sites_router
 
 
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
 
     app.include_router(sites_router)
     app.include_router(challenges_router)
+    app.include_router(siteverify_router)
 
     return app
 
