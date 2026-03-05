@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, Uuid
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from tokentoll.models.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from tokentoll.models.nonce import UsedNonce
 
 
 class Challenge(TimestampMixin, Base):
@@ -28,3 +32,9 @@ class Challenge(TimestampMixin, Base):
         DateTime(timezone=True), nullable=True
     )
     ip_address: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    used_nonces: Mapped[list[UsedNonce]] = relationship(
+        "UsedNonce",
+        back_populates="challenge",
+        cascade="all, delete-orphan",
+    )
