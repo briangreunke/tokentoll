@@ -14,6 +14,7 @@ def test_get_settings_defaults() -> None:
     assert settings.secret_key == "dev-secret-change-me"
     assert settings.token_ttl_seconds == 300
     assert settings.challenge_expiry_seconds == 600
+    assert settings.rsa_private_key_path is None
     assert settings.debug is False
 
 
