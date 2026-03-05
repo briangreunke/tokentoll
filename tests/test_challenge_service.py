@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from tokentoll.challenges.types import GeneratedChallenge, Question
 from tokentoll.config import get_settings
+from tokentoll.errors import InvalidSiteKeyError
 from tokentoll.models import Challenge
 from tokentoll.services import challenge_service
 from tokentoll.services.site_service import create_site
@@ -81,7 +82,7 @@ async def test_create_challenge_persists_answer_key_and_expiry(
 async def test_create_challenge_invalid_site_key_raises(
     db_session: AsyncSession,
 ) -> None:
-    with pytest.raises(ValueError, match="Invalid or inactive site_key"):
+    with pytest.raises(InvalidSiteKeyError):
         await challenge_service.create_challenge(db_session, "missing-key")
 
 
@@ -93,5 +94,5 @@ async def test_create_challenge_inactive_site_raises(
     site.is_active = False
     await db_session.commit()
 
-    with pytest.raises(ValueError, match="Invalid or inactive site_key"):
+    with pytest.raises(InvalidSiteKeyError):
         await challenge_service.create_challenge(db_session, site.site_key)

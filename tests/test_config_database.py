@@ -16,6 +16,7 @@ def test_get_settings_defaults() -> None:
     assert settings.challenge_expiry_seconds == 600
     assert settings.rsa_private_key_path is None
     assert settings.debug is False
+    assert settings.log_level == "INFO"
 
 
 @pytest.mark.asyncio

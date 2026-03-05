@@ -96,7 +96,7 @@ async def test_challenge_rate_limit_blocks_over_limit(
     )
 
     assert response.status_code == 429
-    assert response.json()["detail"]["error"] == "rate_limit_exceeded"
+    assert response.json() == {"error": "Rate limit exceeded"}
     assert response.headers["X-RateLimit-Remaining"] == "0"
     assert response.headers["Retry-After"] == "30"
 
