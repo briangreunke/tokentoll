@@ -42,7 +42,7 @@ async def test_siteverify_api_happy_path(
 ) -> None:
     private_key, public_key = generate_rsa_key_pair()
     monkeypatch.setattr(
-        siteverify_router, "get_public_key", lambda: public_key
+        siteverify_router, "get_public_key", lambda _path=None: public_key
     )
     site, raw_secret = await create_site(db_session, "Site One")
     challenge = await _create_solved_challenge(db_session, site.id)
@@ -75,7 +75,7 @@ async def test_siteverify_api_rejects_invalid_secret(
 ) -> None:
     private_key, public_key = generate_rsa_key_pair()
     monkeypatch.setattr(
-        siteverify_router, "get_public_key", lambda: public_key
+        siteverify_router, "get_public_key", lambda _path=None: public_key
     )
     site, _ = await create_site(db_session, "Site One")
 
@@ -104,7 +104,7 @@ async def test_siteverify_api_rejects_expired_token(
 ) -> None:
     private_key, public_key = generate_rsa_key_pair()
     monkeypatch.setattr(
-        siteverify_router, "get_public_key", lambda: public_key
+        siteverify_router, "get_public_key", lambda _path=None: public_key
     )
     site, raw_secret = await create_site(db_session, "Site One")
 
@@ -134,7 +134,7 @@ async def test_siteverify_api_rejects_wrong_site_token(
 ) -> None:
     private_key, public_key = generate_rsa_key_pair()
     monkeypatch.setattr(
-        siteverify_router, "get_public_key", lambda: public_key
+        siteverify_router, "get_public_key", lambda _path=None: public_key
     )
     site_one, _ = await create_site(db_session, "Site One")
     site_two, site_two_secret = await create_site(db_session, "Site Two")
@@ -166,7 +166,7 @@ async def test_siteverify_api_rejects_malformed_token(
 ) -> None:
     _, public_key = generate_rsa_key_pair()
     monkeypatch.setattr(
-        siteverify_router, "get_public_key", lambda: public_key
+        siteverify_router, "get_public_key", lambda _path=None: public_key
     )
     _, raw_secret = await create_site(db_session, "Site One")
 
