@@ -75,6 +75,38 @@ async def test_cleanup_expired_challenges_removes_old_entries(
 
 
 @pytest.mark.asyncio
+async def test_cleanup_expired_challenges_returns_zero_when_none(
+    db_session: AsyncSession,
+) -> None:
+    now = datetime.now(timezone.utc)
+    site = Site(
+        name="No Expired",
+        site_key="no-expired",
+        secret_key_hash="secret-hash",
+    )
+    db_session.add(site)
+    await db_session.flush()
+
+    active = Challenge(
+        site_id=site.id,
+        context="{}",
+        answer_key="{}",
+        question_count=1,
+        expires_at=now + timedelta(hours=3),
+    )
+    db_session.add(active)
+    await db_session.commit()
+
+    from tokentoll.services.cleanup_service import cleanup_expired_challenges
+
+    deleted = await cleanup_expired_challenges(db_session, older_than_hours=24)
+
+    assert deleted == 0
+    remaining = await db_session.get(Challenge, active.id)
+    assert remaining is not None
+
+
+@pytest.mark.asyncio
 async def test_cleanup_stats_reports_counts(
     db_session: AsyncSession,
 ) -> None:
