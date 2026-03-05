@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from tokentoll.config import get_settings
 from tokentoll.crypto import load_or_generate_private_key
 from tokentoll.database import get_db
+from tokentoll.middleware.rate_limit import check_rate_limit
 from tokentoll.schemas.challenge import (
     ChallengeRequest,
     ChallengeResponse,
@@ -20,7 +21,12 @@ from tokentoll.services.verify_service import verify_challenge
 router = APIRouter(tags=["challenges"])
 
 
-@router.post("/challenge", response_model=ChallengeResponse, status_code=201)
+@router.post(
+    "/challenge",
+    response_model=ChallengeResponse,
+    status_code=201,
+    dependencies=[Depends(check_rate_limit)],
+)
 async def request_challenge(
     body: ChallengeRequest,
     request: Request,

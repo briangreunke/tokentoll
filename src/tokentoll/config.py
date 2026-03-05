@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-change-me"
     token_ttl_seconds: int = 300
     challenge_expiry_seconds: int = 600
+    challenge_rate_limit_per_minute: int = 60
+    challenge_rate_limit_window_seconds: int = 60
     rsa_private_key_path: str | None = None
     debug: bool = False
 
