@@ -119,3 +119,26 @@ async def test_async_context_manager_supports_request(
         challenge = await client.get_challenge()
 
     assert challenge.challenge_id
+
+
+@pytest.mark.asyncio
+async def test_can_use_provided_http_client(
+    sdk_app: object, registered_site: tuple[str, str]
+) -> None:
+    site_key, _ = registered_site
+    transport = ASGITransport(app=sdk_app)
+
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://test"
+    ) as http_client:
+        client = TokenTollClient(
+            base_url="http://test",
+            site_key=site_key,
+            http_client=http_client,
+        )
+
+        challenge = await client.get_challenge()
+        assert challenge.challenge_id
+
+        await client.close()
+        assert http_client.is_closed is False
